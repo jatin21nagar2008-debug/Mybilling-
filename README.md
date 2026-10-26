@@ -64,42 +64,51 @@
 - **Node.js** (v18 or higher — tested on Node v24)
 - **npm** (v9 or higher)
 
-### 2. Installation
-Both the `server` and `client` are organized cleanly:
-
+### 2. Fast Installation (Single Command)
+Run from the root directory:
 ```bash
 # Clone the repository
-git clone <repo-url>
-cd MyBilling
+git clone https://github.com/jatin21nagar2008-debug/Mybilling-.git
+cd Mybilling-
 
-# Install Backend dependencies
-cd server
-npm install
+# Install both server and client dependencies in 1 command:
+npm run install:all
 
-# Initialize Prisma Database & Seed Sample Data
-npx prisma db push
+# Seed initial database with Indian retail demo data
 npm run seed
-
-# Install Frontend dependencies
-cd ../client
-npm install
 ```
 
 ### 3. Running Locally
 
-**Terminal 1 — Backend API Server:**
+You can run both client and server:
+
+**Terminal 1 — Backend API Server (Port 5000):**
 ```bash
-cd server
-npm run dev
-# Server will run on: http://localhost:5000
+npm run dev:server
 ```
 
-**Terminal 2 — Frontend Application:**
+**Terminal 2 — Frontend Application (Port 5173):**
 ```bash
-cd client
+npm run dev:client
+# Or simply:
 npm run dev
-# Web application will open at: http://localhost:5173
 ```
+
+---
+
+## 🌐 Live Deployment on GitHub Pages
+
+This repository is pre-configured with **GitHub Actions** for 100% automated CI/CD deployment to GitHub Pages.
+
+### How to Activate Live Site in GitHub:
+1. Open your repository on GitHub: `https://github.com/jatin21nagar2008-debug/Mybilling-`
+2. Click **Settings** (top navigation tab).
+3. In the left sidebar, click **Pages**.
+4. Under **Build and deployment > Source**, select **GitHub Actions**.
+5. That's it! GitHub will automatically trigger the workflow and publish your React app at:
+   👉 **`https://jatin21nagar2008-debug.github.io/Mybilling-/`**
+
+*(Note: The live GitHub Pages deployment comes with interactive **Offline / Demo Mode** support, preloaded with retail products, POS billing, and thermal invoice printing so anyone can try it directly in their browser without running a local server!)*
 
 ---
 

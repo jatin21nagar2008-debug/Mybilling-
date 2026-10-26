@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "description": "BillingPro — Premium GST Billing & Inventory Management ERP",
   "scripts": {
-    "install:all": "npm --prefix server install && npm --prefix client install",
-    "seed": "npm --prefix server run seed",
+    "dev": "npm --prefix client run dev",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix server run start",
+    "dev:client": "npm --prefix client run dev",
     "dev:server": "npm --prefix server run dev",
-    "dev:client": "npm --prefix client run dev"
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "seed": "npm --prefix server run seed"
   },
   "keywords": ["billing", "gst", "pos", "inventory", "retail"],
   "author": "",
