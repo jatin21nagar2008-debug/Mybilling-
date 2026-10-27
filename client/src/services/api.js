@@ -736,26 +736,67 @@ export const reportApi = {
       async () => {
         const prods = getMockData('products', initialProducts);
         const invs = getMockData('invoices', initialInvoices);
-        const totalSales = invs.reduce((sum, i) => sum + (Number(i.totalAmount) || 0), 0);
+        const totalSales = invs.reduce((sum, i) => sum + (Number(i.grandTotal || i.totalAmount) || 0), 0);
+        const lowStock = prods.filter((p) => (Number(p.currentStock ?? p.stock) || 0) <= (Number(p.minStockAlert ?? p.minStockLevel) || 10));
+        const outOfStock = prods.filter((p) => (Number(p.currentStock ?? p.stock) || 0) <= 0);
+
+        const metrics = {
+          todaySales: totalSales > 0 ? totalSales : 18450,
+          todayInvoicesCount: invs.length || 8,
+          monthSales: (totalSales || 18450) + 142000,
+          monthInvoicesCount: (invs.length || 8) + 42,
+          totalInvoicesCount: (invs.length || 8) + 120,
+          totalRevenue: 245000,
+          costOfGoodsSold: 172000,
+          estimatedGrossProfit: 73000,
+          outstandingReceivables: 4200,
+          outstandingPayables: 6800,
+          totalProducts: prods.length,
+          inventoryValuation: 385000,
+          lowStockCount: lowStock.length,
+          outOfStockCount: outOfStock.length,
+        };
+
+        const paymentDistribution = [
+          { name: 'UPI / QR', value: 94000 },
+          { name: 'Cash', value: 68000 },
+          { name: 'Card', value: 42000 },
+          { name: 'Bank Transfer', value: 41000 },
+        ];
+
+        const bestSellers = prods.slice(0, 5).map((p, idx) => ({
+          name: p.name,
+          quantity: 24 - idx * 3,
+          revenue: (24 - idx * 3) * (Number(p.sellingPrice) || 200),
+        }));
+
+        const lowStockAlerts = lowStock.map((p) => ({
+          id: p.id,
+          name: p.name,
+          currentStock: Number(p.currentStock ?? p.stock) || 0,
+          minStockAlert: Number(p.minStockAlert ?? p.minStockLevel) || 10,
+          unit: p.unit || 'PCS',
+        }));
+
+        const salesTrend = [
+          { date: '2026-10-21', displayDate: 'Mon, 21', sales: 12000, invoices: 6 },
+          { date: '2026-10-22', displayDate: 'Tue, 22', sales: 15400, invoices: 8 },
+          { date: '2026-10-23', displayDate: 'Wed, 23', sales: 18900, invoices: 10 },
+          { date: '2026-10-24', displayDate: 'Thu, 24', sales: 14200, invoices: 7 },
+          { date: '2026-10-25', displayDate: 'Fri, 25', sales: 22100, invoices: 12 },
+          { date: '2026-10-26', displayDate: 'Sat, 26', sales: 31000, invoices: 15 },
+          { date: '2026-10-27', displayDate: 'Sun, 27', sales: totalSales || 24500, invoices: invs.length || 11 },
+        ];
+
         return {
           success: true,
           data: {
-            todaySales: totalSales,
-            todayInvoicesCount: invs.length,
-            monthSales: totalSales + 54000,
-            pendingCredit: 450,
-            lowStockCount: prods.filter((p) => p.stock <= (p.minStockLevel || 10)).length,
-            totalProducts: prods.length,
+            metrics,
+            salesTrend,
+            paymentDistribution,
+            bestSellers,
             recentInvoices: invs.slice(0, 5),
-            salesTrend: [
-              { date: 'Mon', total: 12000 },
-              { date: 'Tue', total: 15400 },
-              { date: 'Wed', total: 18900 },
-              { date: 'Thu', total: 14200 },
-              { date: 'Fri', total: 22100 },
-              { date: 'Sat', total: 31000 },
-              { date: 'Sun', total: totalSales || 24500 },
-            ],
+            lowStockAlerts,
           },
         };
       }

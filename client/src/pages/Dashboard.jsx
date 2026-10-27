@@ -93,7 +93,24 @@ export const Dashboard = () => {
     );
   }
 
-  const { metrics, salesTrend, paymentDistribution, bestSellers, recentInvoices, lowStockAlerts } = data;
+  const metrics = data?.metrics || {
+    todaySales: Number(data?.todaySales) || 0,
+    todayInvoicesCount: Number(data?.todayInvoicesCount) || 0,
+    monthSales: Number(data?.monthSales) || 0,
+    monthInvoicesCount: Number(data?.monthInvoicesCount) || 0,
+    estimatedGrossProfit: Number(data?.estimatedGrossProfit) || 0,
+    outstandingReceivables: Number(data?.outstandingReceivables) || 0,
+    totalProducts: Number(data?.totalProducts) || 0,
+    inventoryValuation: Number(data?.inventoryValuation) || 0,
+    lowStockCount: Number(data?.lowStockCount) || 0,
+    outOfStockCount: Number(data?.outOfStockCount) || 0,
+    outstandingPayables: Number(data?.outstandingPayables) || 0,
+  };
+  const salesTrend = Array.isArray(data?.salesTrend) ? data.salesTrend : [];
+  const paymentDistribution = Array.isArray(data?.paymentDistribution) ? data.paymentDistribution : [];
+  const bestSellers = Array.isArray(data?.bestSellers) ? data.bestSellers : [];
+  const recentInvoices = Array.isArray(data?.recentInvoices) ? data.recentInvoices : [];
+  const lowStockAlerts = Array.isArray(data?.lowStockAlerts) ? data.lowStockAlerts : [];
 
   return (
     <div className="space-y-6">
@@ -138,9 +155,9 @@ export const Dashboard = () => {
           </div>
           <div className="mt-2">
             <span className="text-2xl font-bold text-slate-900 dark:text-white">
-              {currency}{metrics.todaySales.toLocaleString('en-IN')}
+              {currency}{(metrics?.todaySales || 0).toLocaleString('en-IN')}
             </span>
-            <span className="text-xs text-slate-500 ml-2">({metrics.todayInvoicesCount} bills)</span>
+            <span className="text-xs text-slate-500 ml-2">({metrics?.todayInvoicesCount || 0} bills)</span>
           </div>
           <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium flex items-center">
             <span>Authoritative daily cash & digital receipt</span>
@@ -157,9 +174,9 @@ export const Dashboard = () => {
           </div>
           <div className="mt-2">
             <span className="text-2xl font-bold text-slate-900 dark:text-white">
-              {currency}{metrics.monthSales.toLocaleString('en-IN')}
+              {currency}{(metrics?.monthSales || 0).toLocaleString('en-IN')}
             </span>
-            <span className="text-xs text-slate-500 ml-2">({metrics.monthInvoicesCount} bills)</span>
+            <span className="text-xs text-slate-500 ml-2">({metrics?.monthInvoicesCount || 0} bills)</span>
           </div>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
             Current calendar month gross sales
@@ -176,7 +193,7 @@ export const Dashboard = () => {
           </div>
           <div className="mt-2">
             <span className="text-2xl font-bold text-slate-900 dark:text-white">
-              {currency}{metrics.estimatedGrossProfit.toLocaleString('en-IN')}
+              {currency}{(metrics?.estimatedGrossProfit || 0).toLocaleString('en-IN')}
             </span>
           </div>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
@@ -194,7 +211,7 @@ export const Dashboard = () => {
           </div>
           <div className="mt-2">
             <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">
-              {currency}{metrics.outstandingReceivables.toLocaleString('en-IN')}
+              {currency}{(metrics?.outstandingReceivables || 0).toLocaleString('en-IN')}
             </span>
           </div>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
@@ -208,25 +225,25 @@ export const Dashboard = () => {
         <div>
           <span className="text-slate-400 block text-[11px]">Total Products</span>
           <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">
-            {metrics.totalProducts} items
+            {metrics?.totalProducts || 0} items
           </span>
         </div>
         <div>
           <span className="text-slate-400 block text-[11px]">Stock Valuation (At Cost)</span>
           <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">
-            {currency}{metrics.inventoryValuation.toLocaleString('en-IN')}
+            {currency}{(metrics?.inventoryValuation || 0).toLocaleString('en-IN')}
           </span>
         </div>
         <div>
           <span className="text-slate-400 block text-[11px]">Low / Out of Stock</span>
           <span className="font-bold text-rose-600 dark:text-rose-400 text-sm flex items-center space-x-1">
-            <span>{metrics.lowStockCount + metrics.outOfStockCount} items</span>
+            <span>{(metrics?.lowStockCount || 0) + (metrics?.outOfStockCount || 0)} items</span>
           </span>
         </div>
         <div>
           <span className="text-slate-400 block text-[11px]">Supplier Payables</span>
           <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">
-            {currency}{metrics.outstandingPayables.toLocaleString('en-IN')}
+            {currency}{(metrics?.outstandingPayables || 0).toLocaleString('en-IN')}
           </span>
         </div>
       </div>
