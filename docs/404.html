@@ -10,7 +10,7 @@
         var search = window.location.search || '';
         var hash = window.location.hash || '';
 
-        // If repo path is missing trailing slash on mobile link click (e.g. /Mybilling-)
+        // If repo path missing trailing slash (e.g. /Mybilling-)
         if (!pathname.endsWith('/')) {
           var segments = pathname.split('/').filter(Boolean);
           var target = window.location.origin + '/' + segments.join('/') + '/' + search + (hash || '#/');
@@ -18,7 +18,7 @@
           return;
         }
 
-        // Deep links without hash: map /Mybilling-/login -> /Mybilling-/#/login
+        // Subroute: /Mybilling-/login -> /Mybilling-/#/login
         var segments = pathname.split('/').filter(Boolean);
         var repo = segments.length > 0 ? '/' + segments[0] : '';
         var route = segments.slice(1).join('/');
@@ -30,7 +30,7 @@
   <body style="background:#0f172a;color:#94a3b8;font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
     <div style="text-align:center;">
       <h3 style="color:#f8fafc;margin-bottom:8px;">Opening BillingPro...</h3>
-      <p style="font-size:13px;">Redirecting to application...</p>
+      <p style="font-size:13px;">Redirecting...</p>
     </div>
   </body>
 </html>
