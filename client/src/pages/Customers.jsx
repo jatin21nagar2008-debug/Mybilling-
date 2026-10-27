@@ -504,43 +504,56 @@ export const Customers = () => {
               Share these credentials with <strong>{selectedCustomer.name}</strong> so they can log in to view their bills and ledger:
             </p>
 
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 mb-4 font-mono text-xs">
-              <div className="flex justify-between">
-                <span className="text-slate-500">Portal Link:</span>
-                <span className="font-bold text-blue-600">{window.location.origin}/login</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Customer ID:</span>
-                <span className="font-bold text-slate-900">{selectedCustomer.loginId || selectedCustomer.phone}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Registered Phone:</span>
-                <span className="text-slate-800">{selectedCustomer.phone || '-'}</span>
-              </div>
-            </div>
+            {(() => {
+              const portalUrl = (() => {
+                const base = (window.location.origin + window.location.pathname)
+                  .replace(/\/index\.html.*$/i, '')
+                  .replace(/\/+$/, '');
+                return `${base}/#/login`;
+              })();
 
-            <div className="space-y-2">
-              <button
-                onClick={() => {
-                  const msg = `Namaste ${selectedCustomer.name},\nAapka BillingPro Customer Portal login taiyar hai!\n\nLink: ${window.location.origin}/login\nCustomer ID: ${selectedCustomer.loginId || selectedCustomer.phone}\n\nAap yahan se apne saare bills download aur view kar sakte hain.\n- ${business?.name || 'Store'}`;
-                  copyToClipboard(msg);
-                }}
-                className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold flex items-center justify-center space-x-2 shadow-xs"
-              >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                <span>{copied ? 'Copied to Clipboard!' : 'Copy WhatsApp Message'}</span>
-              </button>
+              return (
+                <>
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 mb-4 font-mono text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-500">Portal Link:</span>
+                      <span className="font-bold text-blue-600 truncate max-w-[200px]" title={portalUrl}>{portalUrl}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Customer ID:</span>
+                      <span className="font-bold text-slate-900">{selectedCustomer.loginId || selectedCustomer.phone}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Registered Phone:</span>
+                      <span className="text-slate-800">{selectedCustomer.phone || '-'}</span>
+                    </div>
+                  </div>
 
-              <button
-                onClick={() => {
-                  handleOpenEdit(selectedCustomer);
-                  setShowCredentialsModal(false);
-                }}
-                className="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-center"
-              >
-                Reset / Change Password
-              </button>
-            </div>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => {
+                        const msg = `Namaste ${selectedCustomer.name},\nAapka BillingPro Customer Portal login taiyar hai!\n\nLink: ${portalUrl}\nCustomer ID: ${selectedCustomer.loginId || selectedCustomer.phone}\n\nAap yahan se apne saare bills download aur view kar sakte hain.\n- ${business?.name || 'Store'}`;
+                        copyToClipboard(msg);
+                      }}
+                      className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold flex items-center justify-center space-x-2 shadow-xs"
+                    >
+                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      <span>{copied ? 'Copied to Clipboard!' : 'Copy WhatsApp Message'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        handleOpenEdit(selectedCustomer);
+                        setShowCredentialsModal(false);
+                      }}
+                      className="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-center"
+                    >
+                      Reset / Change Password
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       )}

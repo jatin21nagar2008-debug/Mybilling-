@@ -1,20 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BillingPro — Business Management & GST Billing System</title>
-  <meta http-equiv="refresh" content="0; url=./docs/">
-  <script type="text/javascript">
-    // Preserve any route hash when redirecting into the built docs app
-    const hash = window.location.hash || '';
-    window.location.replace('./docs/' + hash);
-  </script>
-</head>
-<body style="font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #0f172a; color: #f8fafc;">
-  <div style="text-align: center;">
-    <h2 style="margin-bottom: 8px;">Loading BillingPro...</h2>
-    <p style="color: #94a3b8; font-size: 14px;">If not redirected automatically, <a href="./docs/" style="color: #38bdf8;">click here to open the app</a>.</p>
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231e54f7'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>BillingPro — Business Management & GST Billing System</title>
+    <script>
+      // Ensure trailing slash for subpaths (GitHub Pages) so relative assets load seamlessly on mobile
+      (function() {
+        var path = window.location.pathname;
+        if (path && !path.endsWith('/') && !path.split('/').pop().includes('.')) {
+          window.location.replace(window.location.origin + path + '/' + window.location.search + window.location.hash);
+        }
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="./assets/index-B73nBKAb.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-C3oW7421.css">
+  </head>
+  <body class="bg-slate-50 text-slate-900 dark:bg-navy-950 dark:text-slate-100 antialiased font-sans transition-colors duration-150">
+    <div id="root"></div>
+  </body>
 </html>
