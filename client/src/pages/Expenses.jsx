@@ -51,8 +51,9 @@ export const Expenses = () => {
         category: categoryFilter !== 'ALL' ? categoryFilter : undefined,
       });
       if (res.success) {
-        setExpenses(res.data);
-        setTotalExpense(res.totalExpense);
+        setExpenses(res.data || []);
+        const computedTotal = res.totalExpense ?? (res.data || []).reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+        setTotalExpense(computedTotal);
       }
     } catch (e) {
       console.error(e);
@@ -129,7 +130,7 @@ export const Expenses = () => {
         <div>
           <span className="text-xs font-medium text-slate-500 block">Total Recorded Expenses</span>
           <span className="text-2xl font-bold text-slate-900 dark:text-white">
-            {currency}{totalExpense.toLocaleString('en-IN')}
+            {currency}{(Number(totalExpense) || 0).toLocaleString('en-IN')}
           </span>
         </div>
 
@@ -200,7 +201,7 @@ export const Expenses = () => {
                       {exp.referenceNo || '-'}
                     </td>
                     <td className="py-3 px-3 text-right font-bold text-slate-900 dark:text-white">
-                      {currency}{exp.amount.toFixed(2)}
+                      {currency}{(Number(exp.amount) || 0).toFixed(2)}
                     </td>
                     <td className="py-3 px-4 text-right">
                       {isManager && (

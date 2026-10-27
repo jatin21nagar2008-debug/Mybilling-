@@ -15,6 +15,7 @@ import { Reports } from './pages/Reports';
 import { Settings } from './pages/Settings';
 
 import { CustomerPortal } from './pages/CustomerPortal';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const ProtectedRoute = ({ children }) => {
   const { user, isLoading } = useAuth();
@@ -43,36 +44,38 @@ const ProtectedRoute = ({ children }) => {
 
 export const App = () => {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <HashRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/portal" element={<ProtectedRoute><CustomerPortal /></ProtectedRoute>} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <AppLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Dashboard />} />
-              <Route path="pos" element={<BillingPOS />} />
-              <Route path="products" element={<Products />} />
-              <Route path="invoices" element={<Invoices />} />
-              <Route path="customers" element={<Customers />} />
-              <Route path="suppliers" element={<Suppliers />} />
-              <Route path="purchases" element={<Purchases />} />
-              <Route path="expenses" element={<Expenses />} />
-              <Route path="reports" element={<Reports />} />
-              <Route path="settings" element={<Settings />} />
-            </Route>
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </HashRouter>
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <HashRouter>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/portal" element={<ProtectedRoute><CustomerPortal /></ProtectedRoute>} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Dashboard />} />
+                <Route path="pos" element={<BillingPOS />} />
+                <Route path="products" element={<Products />} />
+                <Route path="invoices" element={<Invoices />} />
+                <Route path="customers" element={<Customers />} />
+                <Route path="suppliers" element={<Suppliers />} />
+                <Route path="purchases" element={<Purchases />} />
+                <Route path="expenses" element={<Expenses />} />
+                <Route path="reports" element={<Reports />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </HashRouter>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 };
 

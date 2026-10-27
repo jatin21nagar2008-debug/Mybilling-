@@ -220,15 +220,15 @@ export const Purchases = () => {
                       {p._count?.items || 1}
                     </td>
                     <td className="py-3 px-3 text-right font-bold text-slate-900 dark:text-white">
-                      {currency}{p.grandTotal.toFixed(2)}
+                      {currency}{(Number(p.grandTotal) || 0).toFixed(2)}
                     </td>
                     <td className="py-3 px-3 text-right text-emerald-600 dark:text-emerald-400 font-medium">
-                      {currency}{p.paidAmount.toFixed(2)}
+                      {currency}{(Number(p.paidAmount) || 0).toFixed(2)}
                     </td>
                     <td className="py-3 px-3 text-right">
-                      {p.balanceAmount > 0 ? (
+                      {(Number(p.balanceAmount) || 0) > 0 ? (
                         <span className="font-bold text-rose-600 dark:text-rose-400">
-                          {currency}{p.balanceAmount.toFixed(2)}
+                          {currency}{(Number(p.balanceAmount) || 0).toFixed(2)}
                         </span>
                       ) : (
                         <span className="text-slate-400">-</span>

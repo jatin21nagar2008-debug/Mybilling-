@@ -284,15 +284,15 @@ export const Invoices = () => {
                       {inv._count?.items || 1}
                     </td>
                     <td className="py-3 px-3 text-right font-bold text-slate-900 dark:text-white">
-                      {currency}{inv.grandTotal.toFixed(2)}
+                      {currency}{(Number(inv.grandTotal) || 0).toFixed(2)}
                     </td>
                     <td className="py-3 px-3 text-right font-medium text-emerald-600 dark:text-emerald-400">
-                      {currency}{inv.paidAmount.toFixed(2)}
+                      {currency}{(Number(inv.paidAmount) || 0).toFixed(2)}
                     </td>
                     <td className="py-3 px-3 text-right font-medium">
-                      {inv.balanceAmount > 0 ? (
+                      {(Number(inv.balanceAmount) || 0) > 0 ? (
                         <span className="text-amber-600 dark:text-amber-400">
-                          {currency}{inv.balanceAmount.toFixed(2)}
+                          {currency}{(Number(inv.balanceAmount) || 0).toFixed(2)}
                         </span>
                       ) : (
                         <span className="text-slate-400">-</span>

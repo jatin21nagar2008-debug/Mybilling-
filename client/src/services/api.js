@@ -6,7 +6,32 @@ import {
   initialCustomers,
   initialSuppliers,
   initialInvoices,
+  initialPurchases,
 } from './mockData.js';
+
+export const normalizeProduct = (p) => {
+  if (!p) return p;
+  const sellPrice = Number(p.sellPrice ?? p.price ?? 0);
+  const costPrice = Number(p.costPrice ?? 0);
+  const currentStock = Number(p.currentStock ?? p.stock ?? 0);
+  const taxRate = Number(p.taxRate ?? p.gstRate ?? 18);
+  const minStockAlert = Number(p.minStockAlert ?? p.minStockLevel ?? 5);
+
+  return {
+    ...p,
+    sellPrice,
+    price: sellPrice,
+    costPrice,
+    currentStock,
+    stock: currentStock,
+    taxRate,
+    gstRate: taxRate,
+    minStockAlert,
+    minStockLevel: minStockAlert,
+    unit: p.unit || 'PCS',
+    isTaxInclusive: Boolean(p.isTaxInclusive),
+  };
+};
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
@@ -166,9 +191,9 @@ export const productApi = {
           prods = prods.filter((p) => p.category?.id === params.categoryId || p.categoryId === params.categoryId);
         }
         if (params?.lowStock) {
-          prods = prods.filter((p) => p.stock <= (p.minStockLevel || 5));
+          prods = prods.filter((p) => (Number(p.currentStock ?? p.stock) || 0) <= (Number(p.minStockAlert ?? p.minStockLevel) || 5));
         }
-        return { success: true, data: prods };
+        return { success: true, data: prods.map(normalizeProduct) };
       }
     );
   },
@@ -185,7 +210,7 @@ export const productApi = {
         const prods = getMockData('products', initialProducts);
         const item = prods.find((p) => p.barcode === barcode);
         if (!item) throw new Error('Product not found');
-        return { success: true, data: item };
+        return { success: true, data: normalizeProduct(item) };
       }
     );
   },
@@ -201,7 +226,7 @@ export const productApi = {
       async () => {
         const prods = getMockData('products', initialProducts);
         const item = prods.find((p) => p.id === id);
-        return { success: true, data: item };
+        return { success: true, data: item ? normalizeProduct(item) : null };
       }
     );
   },
@@ -218,13 +243,15 @@ export const productApi = {
       },
       async () => {
         const prods = getMockData('products', initialProducts);
-        const newProduct = {
+        const newProduct = normalizeProduct({
           ...data,
           id: `prod-${Date.now()}`,
-          stock: Number(data.stock) || 0,
-          price: Number(data.price) || 0,
+          stock: Number(data.stock ?? data.currentStock) || 0,
+          currentStock: Number(data.currentStock ?? data.stock) || 0,
+          price: Number(data.price ?? data.sellPrice) || 0,
+          sellPrice: Number(data.sellPrice ?? data.price) || 0,
           costPrice: Number(data.costPrice) || 0,
-        };
+        });
         prods.unshift(newProduct);
         setMockData('products', prods);
         return { success: true, data: newProduct };
@@ -244,10 +271,10 @@ export const productApi = {
       },
       async () => {
         let prods = getMockData('products', initialProducts);
-        prods = prods.map((p) => (p.id === id ? { ...p, ...data } : p));
+        prods = prods.map((p) => (p.id === id ? normalizeProduct({ ...p, ...data }) : p));
         setMockData('products', prods);
         const updated = prods.find((p) => p.id === id);
-        return { success: true, data: updated };
+        return { success: true, data: updated ? normalizeProduct(updated) : null };
       }
     );
   },
@@ -266,13 +293,15 @@ export const productApi = {
         let prods = getMockData('products', initialProducts);
         prods = prods.map((p) => {
           if (p.id === id) {
-            const newStock = Math.max(0, p.stock + (Number(data.quantity) || 0));
-            return { ...p, stock: newStock };
+            const currentStock = Number(p.currentStock ?? p.stock) || 0;
+            const newStock = Math.max(0, currentStock + (Number(data.quantity) || 0));
+            return normalizeProduct({ ...p, stock: newStock, currentStock: newStock });
           }
           return p;
         });
         setMockData('products', prods);
-        return { success: true, data: prods.find((p) => p.id === id) };
+        const updated = prods.find((p) => p.id === id);
+        return { success: true, data: updated ? normalizeProduct(updated) : null };
       }
     );
   },
@@ -623,7 +652,18 @@ export const purchaseApi = {
         return handleResponse(res);
       },
       async () => {
-        return { success: true, data: [] };
+        let list = getMockData('purchases', initialPurchases);
+        if (search) {
+          const s = search.toLowerCase();
+          list = list.filter(
+            (p) =>
+              p.purchaseNumber?.toLowerCase().includes(s) ||
+              p.supplierInvNo?.toLowerCase().includes(s) ||
+              p.supplier?.companyName?.toLowerCase().includes(s) ||
+              p.supplier?.name?.toLowerCase().includes(s)
+          );
+        }
+        return { success: true, data: list };
       }
     );
   },
@@ -637,7 +677,9 @@ export const purchaseApi = {
         return handleResponse(res);
       },
       async () => {
-        return { success: true, data: null };
+        const list = getMockData('purchases', initialPurchases);
+        const item = list.find((p) => p.id === id);
+        return { success: true, data: item || null };
       }
     );
   },
@@ -653,7 +695,23 @@ export const purchaseApi = {
         return handleResponse(res);
       },
       async () => {
-        return { success: true, data: { ...data, id: `pur-${Date.now()}` } };
+        const list = getMockData('purchases', initialPurchases);
+        const grandTotal = Number(data.grandTotal) || 0;
+        const paidAmount = Number(data.paidAmount) || 0;
+        const newPur = {
+          ...data,
+          id: `pur-${Date.now()}`,
+          purchaseNumber: `PO-${Date.now().toString().slice(-6)}`,
+          purchaseDate: new Date().toISOString(),
+          grandTotal,
+          paidAmount,
+          balanceAmount: Math.max(0, grandTotal - paidAmount),
+          paymentStatus: paidAmount >= grandTotal ? 'PAID' : 'PARTIAL',
+          _count: { items: data.items?.length || 1 },
+        };
+        list.unshift(newPur);
+        setMockData('purchases', list);
+        return { success: true, data: newPur };
       }
     );
   },
@@ -675,11 +733,16 @@ export const expenseApi = {
         return handleResponse(res);
       },
       async () => {
-        const expenses = getMockData('expenses', [
-          { id: 'exp-1', category: 'UTILITIES', amount: 3500, description: 'Electricity Bill', date: new Date().toISOString() },
-          { id: 'exp-2', category: 'PACKAGING', amount: 1200, description: 'Packaging Bags & Rolls', date: new Date().toISOString() },
+        let expenses = getMockData('expenses', [
+          { id: 'exp-1', category: 'Rent', amount: 3500, description: 'Store Monthly Rent', date: new Date().toISOString(), paymentMode: 'BANK_TRANSFER' },
+          { id: 'exp-2', category: 'Electricity', amount: 1200, description: 'Electricity Bill', date: new Date().toISOString(), paymentMode: 'UPI' },
+          { id: 'exp-3', category: 'Stationery & Packaging', amount: 800, description: 'Packaging Bags & Thermal Rolls', date: new Date().toISOString(), paymentMode: 'CASH' },
         ]);
-        return { success: true, data: expenses };
+        if (params?.category && params.category !== 'ALL') {
+          expenses = expenses.filter((e) => e.category === params.category);
+        }
+        const totalExpense = expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+        return { success: true, data: expenses, totalExpense };
       }
     );
   },
@@ -696,7 +759,12 @@ export const expenseApi = {
       },
       async () => {
         const expenses = getMockData('expenses', []);
-        const newExp = { ...data, id: `exp-${Date.now()}`, date: new Date().toISOString() };
+        const newExp = {
+          ...data,
+          id: `exp-${Date.now()}`,
+          amount: Number(data.amount) || 0,
+          date: data.date || new Date().toISOString(),
+        };
         expenses.unshift(newExp);
         setMockData('expenses', expenses);
         return { success: true, data: newExp };
@@ -767,7 +835,7 @@ export const reportApi = {
         const bestSellers = prods.slice(0, 5).map((p, idx) => ({
           name: p.name,
           quantity: 24 - idx * 3,
-          revenue: (24 - idx * 3) * (Number(p.sellingPrice) || 200),
+          revenue: (24 - idx * 3) * (Number(p.sellPrice || p.price) || 200),
         }));
 
         const lowStockAlerts = lowStock.map((p) => ({
@@ -819,12 +887,26 @@ export const reportApi = {
         return {
           success: true,
           data: {
-            taxableAmount: 48500,
-            totalCgst: 2425,
-            totalSgst: 2425,
-            totalIgst: 0,
-            totalTax: 4850,
-            totalInvoices: 12,
+            summary: {
+              totalTaxableValue: 48500,
+              totalCgst: 2425,
+              totalSgst: 2425,
+              totalIgst: 0,
+              totalTax: 4850,
+              totalInvoices: 12,
+            },
+            rateWiseBreakdown: [
+              { rate: 0, taxable: 2800, cgst: 0, sgst: 0, igst: 0, total: 2800 },
+              { rate: 5, taxable: 24500, cgst: 612.5, sgst: 612.5, igst: 0, total: 25725 },
+              { rate: 12, taxable: 8400, cgst: 504, sgst: 504, igst: 0, total: 9408 },
+              { rate: 18, taxable: 12800, cgst: 1152, sgst: 1152, igst: 0, total: 15104 },
+            ],
+            hsnWiseBreakdown: [
+              { hsn: '10063020', description: 'Basmati Rice', quantity: 35, taxable: 17150, tax: 857.5, total: 18007.5 },
+              { hsn: '15121910', description: 'Edible Oils', quantity: 60, taxable: 9900, tax: 495, total: 10395 },
+              { hsn: '25010010', description: 'Edible Salt', quantity: 120, taxable: 3360, tax: 0, total: 3360 },
+              { hsn: '04051000', description: 'Butter & Dairy', quantity: 22, taxable: 6050, tax: 726, total: 6776 },
+            ],
           },
         };
       }
@@ -843,12 +925,22 @@ export const reportApi = {
         return {
           success: true,
           data: {
-            totalRevenue: 85000,
-            costOfGoods: 62000,
-            grossProfit: 23000,
-            operatingExpenses: 4700,
-            netProfit: 18300,
-            profitMargin: '21.5%',
+            financials: {
+              grossRevenue: 85000,
+              totalDiscountsGiven: 1200,
+              netSales: 83800,
+              costOfGoodsSold: 58000,
+              grossProfit: 25800,
+              grossMarginPercent: '30.8',
+              totalOperatingExpenses: 6500,
+              netProfitOrLoss: 19300,
+            },
+            expenseBreakdown: [
+              { category: 'Rent', amount: 3500 },
+              { category: 'Electricity', amount: 1200 },
+              { category: 'Salaries & Staff', amount: 1000 },
+              { category: 'Packaging & Stationery', amount: 800 },
+            ],
           },
         };
       }

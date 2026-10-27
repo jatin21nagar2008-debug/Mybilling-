@@ -44,15 +44,15 @@ export const Reports = () => {
   }, [startDate, endDate]);
 
   const handleExportGstCsv = () => {
-    if (!gstData) return;
+    if (!gstData?.rateWiseBreakdown) return;
     const headers = ['Rate (%)', 'Taxable Value (INR)', 'CGST (INR)', 'SGST (INR)', 'IGST (INR)', 'Total Tax (INR)'];
-    const rows = gstData.rateWiseBreakdown.map((r) => [
+    const rows = (gstData.rateWiseBreakdown || []).map((r) => [
       `${r.rate}%`,
       r.taxable,
       r.cgst,
       r.sgst,
       r.igst,
-      (r.cgst + r.sgst + r.igst).toFixed(2),
+      ((Number(r.cgst) || 0) + (Number(r.sgst) || 0) + (Number(r.igst) || 0)).toFixed(2),
     ]);
 
     const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
@@ -126,15 +126,15 @@ export const Reports = () => {
             <div className="bg-white dark:bg-navy-900 p-4 rounded-xl border border-slate-200 dark:border-navy-800 shadow-xs">
               <span className="text-slate-500 block">Total Taxable Turnover</span>
               <span className="text-xl font-bold text-slate-900 dark:text-white mt-1 block">
-                {currency}{gstData.summary.totalTaxableValue.toLocaleString('en-IN')}
+                {currency}{(Number(gstData.summary?.totalTaxableValue) || 0).toLocaleString('en-IN')}
               </span>
-              <span className="text-[10px] text-slate-400">{gstData.summary.totalInvoices} Invoices recorded</span>
+              <span className="text-[10px] text-slate-400">{gstData.summary?.totalInvoices || 0} Invoices recorded</span>
             </div>
 
             <div className="bg-white dark:bg-navy-900 p-4 rounded-xl border border-slate-200 dark:border-navy-800 shadow-xs">
               <span className="text-slate-500 block">CGST Collected</span>
               <span className="text-xl font-bold text-brand-600 dark:text-brand-400 mt-1 block">
-                {currency}{gstData.summary.totalCgst.toLocaleString('en-IN')}
+                {currency}{(Number(gstData.summary?.totalCgst) || 0).toLocaleString('en-IN')}
               </span>
               <span className="text-[10px] text-slate-400">Central Goods & Services Tax</span>
             </div>
@@ -142,7 +142,7 @@ export const Reports = () => {
             <div className="bg-white dark:bg-navy-900 p-4 rounded-xl border border-slate-200 dark:border-navy-800 shadow-xs">
               <span className="text-slate-500 block">SGST Collected</span>
               <span className="text-xl font-bold text-brand-600 dark:text-brand-400 mt-1 block">
-                {currency}{gstData.summary.totalSgst.toLocaleString('en-IN')}
+                {currency}{(Number(gstData.summary?.totalSgst) || 0).toLocaleString('en-IN')}
               </span>
               <span className="text-[10px] text-slate-400">State Goods & Services Tax</span>
             </div>
@@ -150,7 +150,7 @@ export const Reports = () => {
             <div className="bg-white dark:bg-navy-900 p-4 rounded-xl border border-slate-200 dark:border-navy-800 shadow-xs">
               <span className="text-slate-500 block">Total Tax Output Liability</span>
               <span className="text-xl font-bold text-purple-600 dark:text-purple-400 mt-1 block">
-                {currency}{gstData.summary.totalTax.toLocaleString('en-IN')}
+                {currency}{(Number(gstData.summary?.totalTax) || 0).toLocaleString('en-IN')}
               </span>
               <span className="text-[10px] text-slate-400">Combined CGST + SGST + IGST</span>
             </div>
@@ -174,25 +174,25 @@ export const Reports = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-navy-800">
-                {gstData.rateWiseBreakdown.map((r) => (
+                {(gstData.rateWiseBreakdown || []).map((r) => (
                   <tr key={r.rate} className="hover:bg-slate-50/70 dark:hover:bg-navy-800/50">
                     <td className="py-2.5 px-4 font-bold text-brand-600 dark:text-brand-400">
                       {r.rate}% GST
                     </td>
                     <td className="py-2.5 px-3 text-right font-medium">
-                      {currency}{r.taxable.toFixed(2)}
+                      {currency}{(Number(r.taxable) || 0).toFixed(2)}
                     </td>
                     <td className="py-2.5 px-3 text-right text-slate-600 dark:text-slate-400">
-                      {currency}{r.cgst.toFixed(2)}
+                      {currency}{(Number(r.cgst) || 0).toFixed(2)}
                     </td>
                     <td className="py-2.5 px-3 text-right text-slate-600 dark:text-slate-400">
-                      {currency}{r.sgst.toFixed(2)}
+                      {currency}{(Number(r.sgst) || 0).toFixed(2)}
                     </td>
                     <td className="py-2.5 px-3 text-right text-slate-600 dark:text-slate-400">
-                      {currency}{r.igst.toFixed(2)}
+                      {currency}{(Number(r.igst) || 0).toFixed(2)}
                     </td>
                     <td className="py-2.5 px-4 text-right font-bold text-slate-900 dark:text-white">
-                      {currency}{r.total.toFixed(2)}
+                      {currency}{(Number(r.total) || 0).toFixed(2)}
                     </td>
                   </tr>
                 ))}
@@ -218,15 +218,15 @@ export const Reports = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-navy-800 font-mono text-[11px]">
-                {gstData.hsnWiseBreakdown.map((h) => (
+                {(gstData.hsnWiseBreakdown || []).map((h) => (
                   <tr key={h.hsn} className="hover:bg-slate-50/70 dark:hover:bg-navy-800/50">
                     <td className="py-2 px-4 font-bold text-slate-900 dark:text-white">{h.hsn}</td>
                     <td className="py-2 px-3 font-sans">{h.description}</td>
                     <td className="py-2 px-3 text-center font-sans">{h.quantity}</td>
-                    <td className="py-2 px-3 text-right">{currency}{h.taxable.toFixed(2)}</td>
-                    <td className="py-2 px-3 text-right">{currency}{h.tax.toFixed(2)}</td>
+                    <td className="py-2 px-3 text-right">{currency}{(Number(h.taxable) || 0).toFixed(2)}</td>
+                    <td className="py-2 px-3 text-right">{currency}{(Number(h.tax) || 0).toFixed(2)}</td>
                     <td className="py-2 px-4 text-right font-bold text-slate-900 dark:text-white">
-                      {currency}{h.total.toFixed(2)}
+                      {currency}{(Number(h.total) || 0).toFixed(2)}
                     </td>
                   </tr>
                 ))}
@@ -247,17 +247,17 @@ export const Reports = () => {
             <div className="pt-2">
               <div className="flex justify-between font-semibold text-slate-800 dark:text-slate-200">
                 <span>1. Gross Sales Revenue</span>
-                <span>{currency}{pnlData.financials.grossRevenue.toFixed(2)}</span>
+                <span>{currency}{(Number(pnlData.financials?.grossRevenue) || 0).toFixed(2)}</span>
               </div>
-              {pnlData.financials.totalDiscountsGiven > 0 && (
+              {Number(pnlData.financials?.totalDiscountsGiven) > 0 && (
                 <div className="flex justify-between text-slate-500 pl-4 text-[11px]">
                   <span>Less: Customer Discounts Allowed</span>
-                  <span>- {currency}{pnlData.financials.totalDiscountsGiven.toFixed(2)}</span>
+                  <span>- {currency}{(Number(pnlData.financials?.totalDiscountsGiven) || 0).toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between font-bold text-slate-900 dark:text-white pl-4 pt-1">
                 <span>Net Sales Turnover:</span>
-                <span>{currency}{pnlData.financials.netSales.toFixed(2)}</span>
+                <span>{currency}{(Number(pnlData.financials?.netSales) || 0).toFixed(2)}</span>
               </div>
             </div>
 
@@ -265,7 +265,7 @@ export const Reports = () => {
               <div className="flex justify-between text-slate-700 dark:text-slate-300">
                 <span>2. Cost of Goods Sold (COGS)</span>
                 <span className="text-rose-600 dark:text-rose-400 font-semibold">
-                  - {currency}{pnlData.financials.costOfGoodsSold.toFixed(2)}
+                  - {currency}{(Number(pnlData.financials?.costOfGoodsSold) || 0).toFixed(2)}
                 </span>
               </div>
               <p className="text-[10px] text-slate-400">Total acquisition cost of inventory sold in invoices</p>
@@ -274,10 +274,10 @@ export const Reports = () => {
             <div className="pt-2.5 pb-1">
               <div className="flex justify-between font-bold text-sm text-emerald-600 dark:text-emerald-400">
                 <span>3. Gross Operating Profit:</span>
-                <span>{currency}{pnlData.financials.grossProfit.toFixed(2)}</span>
+                <span>{currency}{(Number(pnlData.financials?.grossProfit) || 0).toFixed(2)}</span>
               </div>
               <span className="text-[10px] text-slate-400">
-                Gross Margin: {pnlData.financials.grossMarginPercent}%
+                Gross Margin: {pnlData.financials?.grossMarginPercent || '0'}%
               </span>
             </div>
 
@@ -285,13 +285,13 @@ export const Reports = () => {
               <div className="flex justify-between text-slate-700 dark:text-slate-300 font-semibold">
                 <span>4. Operating & Administrative Expenses</span>
                 <span className="text-rose-600 dark:text-rose-400">
-                  - {currency}{pnlData.financials.totalOperatingExpenses.toFixed(2)}
+                  - {currency}{(Number(pnlData.financials?.totalOperatingExpenses) || 0).toFixed(2)}
                 </span>
               </div>
-              {pnlData.expenseBreakdown.map((exp) => (
+              {(pnlData.expenseBreakdown || []).map((exp) => (
                 <div key={exp.category} className="flex justify-between text-slate-500 pl-4 text-[11px]">
                   <span>{exp.category}:</span>
-                  <span>{currency}{exp.amount.toFixed(2)}</span>
+                  <span>{currency}{(Number(exp.amount) || 0).toFixed(2)}</span>
                 </div>
               ))}
             </div>
@@ -301,12 +301,12 @@ export const Reports = () => {
                 <span>Estimated Net Business Income:</span>
                 <span
                   className={
-                    pnlData.financials.netProfitOrLoss >= 0
+                    (Number(pnlData.financials?.netProfitOrLoss) || 0) >= 0
                       ? 'text-emerald-600 dark:text-emerald-400'
                       : 'text-rose-600 dark:text-rose-400'
                   }
                 >
-                  {currency}{pnlData.financials.netProfitOrLoss.toFixed(2)}
+                  {currency}{(Number(pnlData.financials?.netProfitOrLoss) || 0).toFixed(2)}
                 </span>
               </div>
             </div>

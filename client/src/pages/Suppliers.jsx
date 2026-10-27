@@ -203,9 +203,9 @@ export const Suppliers = () => {
                       {s._count?.purchases || 0}
                     </td>
                     <td className="py-3 px-3 text-right">
-                      {s.balance > 0 ? (
+                      {(Number(s.balance) || 0) > 0 ? (
                         <span className="font-bold text-rose-600 dark:text-rose-400">
-                          {currency}{s.balance.toFixed(2)}
+                          {currency}{(Number(s.balance) || 0).toFixed(2)}
                         </span>
                       ) : (
                         <span className="text-emerald-600 dark:text-emerald-400 font-medium">Nil</span>

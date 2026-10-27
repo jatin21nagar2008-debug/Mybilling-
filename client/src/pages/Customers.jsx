@@ -277,9 +277,9 @@ export const Customers = () => {
                       {c._count?.invoices || 0}
                     </td>
                     <td className="py-3 px-3 text-right">
-                      {c.balance > 0 ? (
+                      {(Number(c.balance) || 0) > 0 ? (
                         <span className="font-bold text-amber-600">
-                          {currency}{c.balance.toFixed(2)}
+                          {currency}{(Number(c.balance) || 0).toFixed(2)}
                         </span>
                       ) : (
                         <span className="text-emerald-600 font-semibold">Cleared</span>

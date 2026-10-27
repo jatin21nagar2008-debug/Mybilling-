@@ -357,27 +357,27 @@ export const Products = () => {
                       {prod.category?.name || 'Unassigned'}
                     </td>
                     <td className="py-3 px-3 text-right font-medium text-slate-600 dark:text-slate-400">
-                      {currency}{prod.costPrice.toFixed(2)}
+                      {currency}{(Number(prod.costPrice) || 0).toFixed(2)}
                     </td>
                     <td className="py-3 px-3 text-right font-bold text-slate-900 dark:text-white">
-                      {currency}{prod.sellPrice.toFixed(2)}
+                      {currency}{(Number(prod.sellPrice ?? prod.price) || 0).toFixed(2)}
                     </td>
                     <td className="py-3 px-3 text-center">
                       <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-brand-50 dark:bg-brand-950 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-900">
-                        {prod.taxRate}%
+                        {prod.taxRate ?? prod.gstRate ?? 18}%
                       </span>
                     </td>
                     <td className="py-3 px-3 text-center">
                       <span
                         className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-bold ${
-                          prod.currentStock <= 0
+                          (Number(prod.currentStock ?? prod.stock) || 0) <= 0
                             ? 'bg-rose-100 dark:bg-rose-950/70 text-rose-600 dark:text-rose-400'
-                            : prod.currentStock <= prod.minStockAlert
+                            : (Number(prod.currentStock ?? prod.stock) || 0) <= (Number(prod.minStockAlert ?? prod.minStockLevel) || 5)
                             ? 'bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-400'
                             : 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400'
                         }`}
                       >
-                        {prod.currentStock} {prod.unit}
+                        {Number(prod.currentStock ?? prod.stock) || 0} {prod.unit || 'PCS'}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right space-x-1">
